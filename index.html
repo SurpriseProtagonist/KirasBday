@@ -62,7 +62,6 @@
             </tbody>
         </table>
         <button id="generate-card">Generate New Card</button>
-    
         <script>
             const bingoPrompts = [
                 "Prompt 1",
@@ -80,10 +79,14 @@
                 const bingoCard = document.getElementById("bingo-card");
                 bingoCard.innerHTML = "";
     
-                let savedState = JSON.parse(localStorage.getItem("bingoCardState"));
+                let savedCardState = JSON.parse(localStorage.getItem("bingoCardState"));
+                let savedButtonState = JSON.parse(localStorage.getItem("buttonState"));
     
-                if (!savedState) {
-                    savedState = generateNewCard();
+                if (!savedCardState || !savedButtonState) {
+                    savedCardState = generateNewCard();
+                    savedButtonState = {};
+                    saveBingoCardState(savedCardState);
+                    saveButtonState(savedButtonState);
                 }
     
                 for (let row = 0; row < cardSize; row++) {
@@ -97,14 +100,19 @@
                             td.classList.add("center");
                         } else {
                             const index = row * cardSize + col;
-                            td.textContent = savedState[index].prompt;
+                            td.textContent = savedCardState[index].prompt;
                             td.classList.add("bingo-cell");
+    
+                            // Check button state for cell
+                            if (savedButtonState[index]) {
+                                td.classList.add("completed");
+                            }
     
                             // Add click event to mark cell as completed
                             td.addEventListener("click", () => {
                                 td.classList.toggle("completed");
-                                savedState[index].completed = !savedState[index].completed;
-                                saveBingoCardState(savedState);
+                                savedButtonState[index] = !savedButtonState[index];
+                                saveButtonState(savedButtonState);
                             });
                         }
     
@@ -117,23 +125,32 @@
             // Function to generate a new bingo card
             function generateNewCard() {
                 const newCardState = [];
+                const newButtonState = {};
     
                 for (let i = 0; i < cardSize * cardSize; i++) {
                     if (i === centerCellIndex) {
-                        newCardState.push({ prompt: "Free Space", completed: false });
+                        newCardState.push({ prompt: "Free Space" });
+                        newButtonState[i] = false;
                     } else {
                         const randomPrompt = bingoPrompts[Math.floor(Math.random() * bingoPrompts.length)];
-                        newCardState.push({ prompt: randomPrompt, completed: false });
+                        newCardState.push({ prompt: randomPrompt });
+                        newButtonState[i] = false;
                     }
                 }
     
                 saveBingoCardState(newCardState);
+                saveButtonState(newButtonState);
                 return newCardState;
             }
     
             // Function to save bingo card state to local storage
             function saveBingoCardState(state) {
                 localStorage.setItem("bingoCardState", JSON.stringify(state));
+            }
+    
+            // Function to save button state to local storage
+            function saveButtonState(state) {
+                localStorage.setItem("buttonState", JSON.stringify(state));
             }
     
             // Event listener to generate a new bingo card
