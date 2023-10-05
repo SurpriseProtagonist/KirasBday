@@ -54,112 +54,105 @@
             }
         </style>
     </head>
-    <body>
-        <h1>Bingo Card</h1>
-        <table>
-            <tbody id="bingo-card">
-                <!-- Bingo card cells will be generated here -->
-            </tbody>
-        </table>
-        <script>
-            const bingoPrompts = [
-                "Prompt 1",
-                "Prompt 2",
-                "Prompt 3",
-                "Prompt 4",
-                // Add more prompts as needed
-            ];
-    
-            const cardSize = 5; // 5x5 bingo card
-            const centerCellIndex = Math.floor(cardSize * cardSize / 2);
-    
-            // Function to generate a random bingo card or load from local storage
-            function generateOrLoadBingoCard() {
-                const bingoCard = document.getElementById("bingo-card");
-                bingoCard.innerHTML = "";
-    
-                let savedCardState = JSON.parse(localStorage.getItem("bingoCardState"));
-                let savedButtonState = JSON.parse(localStorage.getItem("buttonState"));
-    
-                if (!savedCardState || !savedButtonState) {
-                    savedCardState = generateNewCard();
-                    savedButtonState = {};
-                    saveBingoCardState(savedCardState);
-                    saveButtonState(savedButtonState);
-                }
-    
-                for (let row = 0; row < cardSize; row++) {
-                    const tr = document.createElement("tr");
-                    for (let col = 0; col < cardSize; col++) {
-                        const td = document.createElement("td");
-    
-                        // Set the center cell as "Free Space"
-                        if (row === centerCellIndex && col === centerCellIndex) {
-                            td.textContent = "Free Space";
-                            td.classList.add("center");
-                        } else {
-                            const index = row * cardSize + col;
-                            td.textContent = savedCardState[index].prompt;
-                            td.classList.add("bingo-cell");
-    
-                            // Check button state for cell
-                            if (savedButtonState[index]) {
-                                td.classList.add("completed");
-                            }
-    
-                            // Add click event to mark cell as completed
-                            td.addEventListener("click", () => {
-                                td.classList.toggle("completed");
-                                savedButtonState[index] = !savedButtonState[index];
-                                saveButtonState(savedButtonState);
-                            });
-                        }
-    
-                        tr.appendChild(td);
-                    }
-                    bingoCard.appendChild(tr);
-                }
+<body>
+    <h1>Bingo Card</h1>
+    <table>
+        <tbody id="bingo-card">
+            <!-- Bingo card cells will be generated here -->
+        </tbody>
+    </table>
+
+    <script>
+        const bingoPrompts = [
+            "Prompt 1",
+            "Prompt 2",
+            "Prompt 3",
+            "Prompt 4",
+            // Add more prompts as needed
+        ];
+
+        const cardSize = 5; // 5x5 bingo card
+        const centerCellIndex = Math.floor(cardSize * cardSize / 2);
+
+        // Function to generate a random bingo card or load from local storage
+        function generateOrLoadBingoCard() {
+            const bingoCard = document.getElementById("bingo-card");
+            bingoCard.innerHTML = "";
+
+            let savedCardState = JSON.parse(localStorage.getItem("bingoCardState"));
+            let savedButtonState = JSON.parse(localStorage.getItem("buttonState"));
+
+            if (!savedCardState || !savedButtonState) {
+                savedCardState = generateNewCard();
+                savedButtonState = {};
             }
-    
-            // Function to generate a new bingo card
-            function generateNewCard() {
-                const newCardState = [];
-                const newButtonState = {};
-    
-                for (let i = 0; i < cardSize * cardSize; i++) {
-                    if (i === centerCellIndex) {
-                        newCardState.push({ prompt: "Free Space" });
-                        newButtonState[i] = false;
+
+            for (let row = 0; row < cardSize; row++) {
+                const tr = document.createElement("tr");
+                for (let col = 0; col < cardSize; col++) {
+                    const td = document.createElement("td");
+
+                    // Set the center cell as "Free Space"
+                    if (row === centerCellIndex && col === centerCellIndex) {
+                        td.textContent = "Free Space";
+                        td.classList.add("center");
                     } else {
-                        const randomPrompt = bingoPrompts[Math.floor(Math.random() * bingoPrompts.length)];
-                        newCardState.push({ prompt: randomPrompt });
-                        newButtonState[i] = false;
+                        const index = row * cardSize + col;
+                        td.textContent = savedCardState[index].prompt;
+                        td.classList.add("bingo-cell");
+
+                        // Check button state for cell
+                        if (savedButtonState[index]) {
+                            td.classList.add("completed");
+                        }
+
+                        // Add click event to mark cell as completed
+                        td.addEventListener("click", () => {
+                            td.classList.toggle("completed");
+                            savedButtonState[index] = !savedButtonState[index];
+                            saveButtonState(savedButtonState);
+                        });
                     }
+
+                    tr.appendChild(td);
                 }
-    
-                saveBingoCardState(newCardState);
-                saveButtonState(newButtonState);
-                return newCardState;
+                bingoCard.appendChild(tr);
             }
-    
-            // Function to save bingo card state to local storage
-            function saveBingoCardState(state) {
-                localStorage.setItem("bingoCardState", JSON.stringify(state));
+        }
+
+        // Function to generate a new bingo card
+        function generateNewCard() {
+            const newCardState = [];
+            const newButtonState = {};
+
+            for (let i = 0; i < cardSize * cardSize; i++) {
+                if (i === centerCellIndex) {
+                    newCardState.push({ prompt: "Free Space" });
+                    newButtonState[i] = false;
+                } else {
+                    const randomPrompt = bingoPrompts[Math.floor(Math.random() * bingoPrompts.length)];
+                    newCardState.push({ prompt: randomPrompt });
+                    newButtonState[i] = false;
+                }
             }
-    
-            // Function to save button state to local storage
-            function saveButtonState(state) {
-                localStorage.setItem("buttonState", JSON.stringify(state));
-            }
-    
-            // Event listener to generate a new bingo card
-            document.getElementById("generate-card").addEventListener("click", () => {
-                const newCardState = generateNewCard();
-                generateOrLoadBingoCard();
-            });
-    
-            // Generate or load the bingo card on page load
-            generateOrLoadBingoCard();
-        </script>
-    </body>
+
+            saveBingoCardState(newCardState);
+            saveButtonState(newButtonState);
+            return newCardState;
+        }
+
+        // Function to save bingo card state to local storage
+        function saveBingoCardState(state) {
+            localStorage.setItem("bingoCardState", JSON.stringify(state));
+        }
+
+        // Function to save button state to local storage
+        function saveButtonState(state) {
+            localStorage.setItem("buttonState", JSON.stringify(state));
+        }
+
+        // Generate or load the bingo card on page load
+        generateOrLoadBingoCard();
+    </script>
+</body>
 </html>
