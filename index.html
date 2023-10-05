@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Card</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 24px;
+        }
+
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+
+        td {
+            width: 80px;
+            height: 80px;
+            border: 1px solid #ccc;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        td.completed {
+            background-color: #66bb6a; /* Green for completed cells */
+        }
+
+        /* Style the center cell as 'Free Space' */
+        td.center {
+            background-color: #f3f3f3;
+            font-weight: bold;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bingo Card</h1>
+    <table>
+        <tbody id="bingo-card">
+            <!-- Bingo card cells will be generated here -->
+        </tbody>
+    </table>
+    <button id="generate-card">Generate New Card</button>
+
+    <script>
+        const bingoPrompts = [
+            "Prompt 1",
+            "Prompt 2",
+            "Prompt 3",
+            "Prompt 4",
+            // Add more prompts as needed
+        ];
+
+        const cardSize = 5; // 5x5 bingo card
+        const centerCellIndex = Math.floor(cardSize * cardSize / 2);
+
+        // Function to generate a random bingo card
+        function generateBingoCard() {
+            const bingoCard = document.getElementById("bingo-card");
+            bingoCard.innerHTML = "";
+
+            for (let row = 0; row < cardSize; row++) {
+                const tr = document.createElement("tr");
+                for (let col = 0; col < cardSize; col++) {
+                    const td = document.createElement("td");
+                    td.textContent = bingoPrompts[Math.floor(Math.random() * bingoPrompts.length)];
+                    td.classList.add("bingo-cell");
+
+                    // Add click event to mark cell as completed
+                    td.addEventListener("click", () => {
+                        td.classList.toggle("completed");
+                        saveBingoCardState();
+                    });
+
+                    // Add center cell class
+                    if (row === centerCellIndex && col === centerCellIndex) {
+                        td.textContent = "Free Space";
+                        td.classList.add("center");
+                    }
+
+                    tr.appendChild(td);
+                }
+                bingoCard.appendChild(tr);
+            }
+        }
+
+        // Function to save bingo card state to local storage
+        function saveBingoCardState() {
+            const bingoCells = document.querySelectorAll(".bingo-cell");
+            const state = Array.from(bingoCells, cell => ({
+                prompt: cell.textContent,
+                completed: cell.classList.contains("completed")
+            }));
+
+            localStorage.setItem("bingoCardState", JSON.stringify(state));
+        }
+
+        // Function to load bingo card state from local storage
+        function loadBingoCardState() {
+            const savedState = JSON.parse(localStorage.getItem("bingoCardState"));
+            if (savedState && savedState.length === cardSize * cardSize) {
+                const bingoCells = document.querySelectorAll(".bingo-cell");
+                savedState.forEach((cellState, index) => {
+                    const cell = bingoCells[index];
+                    if (cellState.completed) {
+                        cell.classList.add("completed");
+                    }
+                });
+            }
+        }
+
+        // Event listener to generate a new bingo card
+        document.getElementById("generate-card").addEventListener("click", generateBingoCard);
+
+        // Load bingo card state when the page loads
+        loadBingoCardState();
+        generateBingoCard(); // Generate the initial card
+    </script>
+</body>
+</html>
