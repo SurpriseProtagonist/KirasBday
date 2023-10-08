@@ -1,61 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Bingo Card</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                text-align: center;
-            }
-    
-            h1 {
-                font-size: 24px;
-            }
-    
-            table {
-                margin: 0 auto;
-                border-collapse: collapse;
-            }
-    
-            td {
-                width: 80px;
-                height: 80px;
-                border: 1px solid #ccc;
-                text-align: center;
-                vertical-align: middle;
-                font-size: 16px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-    
-            td.completed {
-                background-color: #66bb6a; /* Green for completed cells */
-            }
-    
-            /* Style the center cell as 'Free Space' */
-            td.center {
-                background-color: #f3f3f3;
-                font-weight: bold;
-            }
-    
-            button {
-                margin-top: 20px;
-                padding: 10px 20px;
-                background-color: #007bff;
-                color: #fff;
-                border: none;
-                cursor: pointer;
-            }
-    
-            button:hover {
-                background-color: #0056b3;
-            }
-        </style>
-    </head>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.0/dist/confetti.browser.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIRA BINGO</title>
+    <style>
+        /* CSS styles for the celebratory bingo card */
+        body {
+            background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #333;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+
+        td {
+            width: 150px;
+            height: 150px;
+            border: 1px solid #ccc;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            word-wrap: break-word;
+        }
+
+        td.completed {
+            background-color: #ffc107; /* Yellow for completed cells */
+        }
+
+        /* Rainbow button effect */
+        td.completed:nth-child(1) {
+            background: linear-gradient(to right, #ff0000, #ff9900);
+        }
+
+        td.completed:nth-child(2) {
+            background: linear-gradient(to right, #ff9900, #ffcc00);
+        }
+
+        td.completed:nth-child(3) {
+            background: linear-gradient(to right, #ffcc00, #33cc33);
+        }
+
+        td.completed:nth-child(4) {
+            background: linear-gradient(to right, #33cc33, #3399ff);
+        }
+
+        td.completed:nth-child(5) {
+            background: linear-gradient(to right, #3399ff, #9900cc);
+        }
+
+        /* Fun animations */
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        td.completed:hover {
+            animation: rotate 2s infinite linear;
+        }
+    </style>
+</head>
+
 <body>
-    <h1>Bingo Card</h1>
+    <h1>KIRA BINGO</h1>
     <table>
         <tbody id="bingo-card">
             <!-- Bingo card cells will be generated here -->
@@ -64,55 +88,68 @@
 
     <script>
         const bingoPrompts = [
-            "Prompt 1",
-            "Prompt 2",
-            "Prompt 3",
-            "Prompt 4",
-            // Add more prompts as needed
+            "Touch a wild animal",
+            "Talk w an accent and convince a stranger you're from that country",
+            "Get a selfie with a dog that is not your own",
+            "Convince a stranger to buy you a shot",
+            "Collect a dozen lime slices (Kira likes limes)",
+            "Facetime your ex and get them to wish Kira a happy birthday",
+            "Find someone who grew up within 200 miles of you",
+            "Get a stranger to email Kira their resume. kiratelgen1@gmail.com",
+            "Get Kira a Topo Chico Twist of Lime in a glass bottle",
+            "Get a chant going (more than 10 people)",
+            "Propose to a stranger at a bar",
+            "Send a selfie of everyone at the party to an ONS",
+            "FREE: Like Kira's review on Rainier Health and Fitness' Google page",
+            "Find someone who speaks 4 languages",
+            "Dance on an elevated surface (stage, table, chair) (NOT IN KIRA'S APT)",
+            "Balance five sparkling waters on top of your head. And then give them to Kira",
+            "Create a portrait of Kira and gift it to her",
+            "Find someone with the same birthday as you",
+            "Record a stranger reciting the Gettysburg Address. Or memorize it yourself and recite it to Kira",
+            "Exchange a piece of clothing with someone",
+            "Steal a fun little coaster from a bar",
+            "Win an arm wrestle",
+            "Make a toast to Kira at a bar (get strangers to listen in)",
+            "Send a selfie of everyone at the party to an ONS",
+            "Set Kira up on a blind date with a stranger you meet"
         ];
 
         const cardSize = 5; // 5x5 bingo card
         const centerCellIndex = Math.floor(cardSize * cardSize / 2);
 
-        // Function to generate a random bingo card or load from local storage
-        function generateOrLoadBingoCard() {
+        function generateBingoCard() {
             const bingoCard = document.getElementById("bingo-card");
             bingoCard.innerHTML = "";
 
-            let savedCardState = JSON.parse(localStorage.getItem("bingoCardState"));
-            let savedButtonState = JSON.parse(localStorage.getItem("buttonState"));
-
-            if (!savedCardState || !savedButtonState) {
-                savedCardState = generateNewCard();
-                savedButtonState = {};
-            }
+            const promptsCount = bingoPrompts.length;
 
             for (let row = 0; row < cardSize; row++) {
                 const tr = document.createElement("tr");
                 for (let col = 0; col < cardSize; col++) {
                     const td = document.createElement("td");
+                    const index = row * cardSize + col;
+                    const prompt = bingoPrompts[index % promptsCount];
+                    td.textContent = prompt;
+                    td.classList.add("bingo-cell");
 
-                    // Set the center cell as "Free Space"
-                    if (row === centerCellIndex && col === centerCellIndex) {
-                        td.textContent = "Free Space";
-                        td.classList.add("center");
-                    } else {
-                        const index = row * cardSize + col;
-                        td.textContent = savedCardState[index].prompt;
-                        td.classList.add("bingo-cell");
-
-                        // Check button state for cell
-                        if (savedButtonState[index]) {
-                            td.classList.add("completed");
-                        }
-
-                        // Add click event to mark cell as completed
-                        td.addEventListener("click", () => {
-                            td.classList.toggle("completed");
-                            savedButtonState[index] = !savedButtonState[index];
-                            saveButtonState(savedButtonState);
-                        });
+                    // Check and apply the completed state from local storage
+                    const completedState = localStorage.getItem(`cell${index}`);
+                    if (completedState === "completed") {
+                        td.classList.add("completed");
                     }
+
+                    td.addEventListener("click", () => {
+                        td.classList.toggle("completed");
+                        if (td.classList.contains("completed")) {
+                            localStorage.setItem(`cell${index}`, "completed");
+                        } else {
+                            localStorage.removeItem(`cell${index}`);
+                        }             
+                        if (checkForBingoWin()) {
+                            triggerConfetti();
+                        }
+                    });
 
                     tr.appendChild(td);
                 }
@@ -120,39 +157,77 @@
             }
         }
 
-        // Function to generate a new bingo card
-        function generateNewCard() {
-            const newCardState = [];
-            const newButtonState = {};
+         // Function to check for a bingo win
+        function checkForBingoWin() {
+            const rows = document.querySelectorAll("tr");
+            const cells = document.querySelectorAll(".bingo-cell");
 
-            for (let i = 0; i < cardSize * cardSize; i++) {
-                if (i === centerCellIndex) {
-                    newCardState.push({ prompt: "Free Space" });
-                    newButtonState[i] = false;
-                } else {
-                    const randomPrompt = bingoPrompts[Math.floor(Math.random() * bingoPrompts.length)];
-                    newCardState.push({ prompt: randomPrompt });
-                    newButtonState[i] = false;
+            // Check rows for a win
+            for (let row = 0; row < cardSize; row++) {
+                let rowWin = true;
+                for (let col = 0; col < cardSize; col++) {
+                    const index = row * cardSize + col;
+                    if (!cells[index].classList.contains("completed")) {
+                        rowWin = false;
+                        break;
+                    }
+                }
+                if (rowWin) {
+                    return true;
                 }
             }
 
-            saveBingoCardState(newCardState);
-            saveButtonState(newButtonState);
-            return newCardState;
+            // Check columns for a win
+            for (let col = 0; col < cardSize; col++) {
+                let colWin = true;
+                for (let row = 0; row < cardSize; row++) {
+                    const index = row * cardSize + col;
+                    if (!cells[index].classList.contains("completed")) {
+                        colWin = false;
+                        break;
+                    }
+                }
+                if (colWin) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
-        // Function to save bingo card state to local storage
-        function saveBingoCardState(state) {
-            localStorage.setItem("bingoCardState", JSON.stringify(state));
+        // Function to trigger confetti animation
+        function triggerConfetti() {
+            const duration = 10 * 1000;
+            const options = {
+                particleCount: 150,
+                spread: 120,
+                colors: ['#ff0000', '#ff9900', '#ffcc00', '#33cc33', '#3399ff', '#9900cc']
+            };
+
+            const canvas = document.createElement('canvas');
+            document.body.appendChild(canvas);
+
+            canvas.style.position = 'fixed';
+            canvas.style.pointerEvents = 'none';
+            canvas.style.top = '0';
+            canvas.style.left = '0';
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            canvas.style.zIndex = '1000';
+
+            var myConfetti = confetti.create(canvas, {
+                resize: true,
+                useWorker: true
+            });
+
+            myConfetti(options);
+            setTimeout(() => {
+                confetti.reset();
+            }, duration);
         }
 
-        // Function to save button state to local storage
-        function saveButtonState(state) {
-            localStorage.setItem("buttonState", JSON.stringify(state));
-        }
-
-        // Generate or load the bingo card on page load
-        generateOrLoadBingoCard();
+        // Generate the bingo card on page load
+        generateBingoCard();
     </script>
 </body>
 </html>
