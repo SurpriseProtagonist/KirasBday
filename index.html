@@ -6,14 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KIRA BINGO</title>
     <style>
-        /* CSS styles for the celebratory bingo card */
+        /* CSS styles for the responsive bingo card */
         body {
             background-color: #f9f9f9;
-            font-family: Arial, sans-serif;
+            font-family: "Comic Sans MS", "Comic Sans", cursive;
             text-align: center;
+            margin: 0;
+            overflow: hidden; /* Prevent vertical and horizontal scrolling */
         }
 
         h1 {
+            text-align: center;
             font-size: 36px;
             color: #333;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
@@ -27,19 +30,26 @@
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
             margin-top: 20px;
+            width: 100%; /* Set the width of the table to match the viewport height */
+            table-layout: fixed; /* Ensure consistent cell size */
+        }
+
+        .cell-container {
+            width: 20%; /* Set a fixed width for consistent cell size (5 cells in a row) */
+            position: relative;
         }
 
         td {
-            width: 150px;
-            height: 150px;
+            padding: 10px;
             border: 1px solid #ccc;
             text-align: center;
             vertical-align: middle;
-            font-size: 18px;
+            font-size: 18px; /* Default font size */
             cursor: pointer;
             transition: background-color 0.3s ease;
             word-wrap: break-word;
         }
+
 
         td.completed {
             background-color: #ffc107; /* Yellow for completed cells */
@@ -74,6 +84,32 @@
 
         td.completed:hover {
             animation: rotate 2s infinite linear;
+        }
+
+        /* Center content vertically and horizontally */
+        .content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Responsive font size */
+        @media screen and (max-width: 768px) {
+            td {
+                font-size: 14px; /* Adjust font size for smaller screens */
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            td {
+                font-size: 12px; /* Further adjust font size for very small screens */
+            }
         }
     </style>
 </head>
